@@ -8,7 +8,7 @@ $rule = [
 	'email'=>['type'=>'str','default'=>'','vstr'=>'strIs:email'],
 	'qq'=>['type'=>'str','default'=>'','vstr'=>'strIs:qq'],
 	'ip'=>['type'=>'str','default'=>'','vstr'=>'strIs:ip'],//
-	'ip_range'=>['type'=>'str','default'=>'','vstr'=>'strIs:ip_range'],//ip断
+	'ip_range'=>['type'=>'str','default'=>'','vstr'=>'strIs:ip_range'],//ip段
 	'params'=>[
 	    'type'=>'list',
 	    'default'=>[],
