@@ -29,5 +29,5 @@ $params = [
 	'params'=>['id'=>0],
 ];
 $data = Valid::make($rule,$params);
-var_export($data);`
+var_export($data);
 ```
