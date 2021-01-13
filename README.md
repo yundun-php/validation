@@ -1,8 +1,8 @@
 # 对数据验证
 #### 使用
-(```)
 
-`$rule = [
+```
+$rule = [
 	'age'=>['type'=>'int','default'=>0,'vstr'=>'num|>:0'],
 	'account'=>['type'=>'str','default'=>'','vstr'=>'must|strIn:word','name'=>'账号必填|账号必须为字母'],
 	'email'=>['type'=>'str','default'=>'','vstr'=>'strIs:email'],
@@ -30,4 +30,4 @@ $params = [
 ];
 $data = Valid::make($rule,$params);
 var_export($data);`
-(```)
+```
