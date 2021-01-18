@@ -193,7 +193,7 @@ class Valid
         $this->rule    = array_merge($this->rule, $rules);
         $this->message = array_merge($this->message, $message);
         $this->field   = array_merge($this->field, $field);
-        self::$typeMsg =  self::$typeMsg[$lang];
+        
     }
 
     /**
@@ -473,7 +473,7 @@ class Valid
                 }
 
                 
-                return ['msg'=>$message,'code'=>isset(self::$typeMsg[$info]['code']) ?  self::$typeMsg[$info]['code'] : 1200010 ];
+                return ['msg'=>$message,'code'=>isset(self::$typeMsg[$this->lang][$info]['code']) ?  self::$typeMsg[$this->lang][$info]['code'] : 1200010 ];
             } elseif (true !== $result) {
                 // 返回自定义错误信息
                 if (is_string($result) && false !== strpos($result, ':')) {
@@ -1289,10 +1289,10 @@ class Valid
             $msg = $this->message[$attribute][$type]['msg'];
         } elseif (isset($this->message[$attribute])) {
             $msg = $this->message[$attribute];
-        } elseif (isset(self::$typeMsg[$type]['msg'])) {
-            $msg = self::$typeMsg[$type]['msg'];
+        } elseif (isset(self::$typeMsg[$this->lang][$type]['msg'])) {
+            $msg = self::$typeMsg[$this->lang][$type]['msg'];
         } elseif (0 === strpos($type, 'must')) {
-            $msg = self::$typeMsg['must']['msg'];
+            $msg = self::$typeMsg[$this->lang]['must']['msg'];
         } else {
             $msg = $this->lang =='zh' ? $attribute . ' 类型不存在' : $attribute . ' type not exists';
         }
