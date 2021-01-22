@@ -22,16 +22,18 @@ class ValidTest {
 	              'id'=>['type'=>'int','default'=>0,'vstr'=>'must|num|>:0'],
 	              
 	          ],
-	       ], 
+	       ],
+	       'emptyarr'=>['type'=>'list','default'=>[],'vstr'=>'count_gt:1|arr_null'], 
 	    ];
 	    $params = [
 	        'age'=>1,
-	        'account'=>'fdsafsdf',
+	        'account'=>'ssss',
 	        'email'=>'afsafdsaf@qq.com',
 	        'qq'=>'43546456',
 	        'ip'=>'10.10.1.1',
 	        'ip_range'=>'1.1.1.1-3.3.3.3',//支持 1.1.1.1-3.3.3.3 or 1.1.1.1/25
-	        'params'=>['id'=>0],
+	        'params'=>['id'=>1],
+	        'emptyarr'=>['',1],
 	    ];
 	    $data = Valid::make($rule,$params);
 	    var_export($data);

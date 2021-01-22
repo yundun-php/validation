@@ -67,6 +67,7 @@ class Valid
                 'min'         => ['msg'=>':attribute长度不能小于 :rule','code'=>1200045],
                 'mustIf'      => ['msg'=>':attribute不能为空','code'=>1200046],// 验证某个字段的值等于某个值的时候必须 mustIf:field,value  'password'=>'mustIf:account,1' 当account的值等于1的时候 password必须
                 'mustWith'    => ['msg'=>':attribute不能为空','code'=>1200047],// 验证某个字段有值的时候必须 mustWith:field 'password'=>'mustWith:account' // 当account有值的时候password字段必须
+                'arr_null'    => ['msg'=>':attribute有空值','code'=>1200048],
             ],
             'en'=>[
                 'must'        => ['msg'=>':attribute must','code'=>1200010],
@@ -107,6 +108,7 @@ class Valid
                 'min'         => ['msg'=>'min size of :attribute must be :rule','code'=>1200045],
                 'mustIf'      => ['msg'=>':attribute can not be empty','code'=>1200046],// 验证某个字段的值等于某个值的时候必须 mustIf:field,value  'password'=>'mustIf:account,1' 当account的值等于1的时候 password必须
                 'mustWith'    => ['msg'=>':attribute can not be empty','code'=>1200047],// 验证某个字段有值的时候必须 mustWith:field 'password'=>'mustWith:account' // 当account有值的时候password字段必须
+                'arr_null'    => ['msg'=>':attribute There are null values','code'=>1200048],
             ],
             
     ];
@@ -229,7 +231,7 @@ class Valid
      * @return [type]
      */
     private function __returnData(&$data,$rules) {
-        //!in_array($key, array_keys($rules)
+       
         if(is_array($data)) {
             foreach ($data as $key => $value) {
                 if(!isset($rules[$key])) {
@@ -262,11 +264,7 @@ class Valid
     public function check($data, $rules = [], $msg_title=[],$scene = '') {
 
         //$this->error = [];
-        
         $this->merge_title = array_merge($this->merge_title,$msg_title);
-        
-        
-
         // 读取验证规则
         if (empty($rules)) $rules = $this->rule;
 
@@ -289,7 +287,7 @@ class Valid
                 $title = isset($this->field[$key]) ? $this->field[$key] : $key;
             }
             
-            if($this->merge_title) {
+            if($msg_title && $this->merge_title) {
                 $title = implode('/',$this->merge_title).'/';
             }
             
@@ -432,19 +430,25 @@ class Valid
         $i = 0;
         
         foreach ($rules as $key => $rule) {
+            
             if($rule instanceof \Closure) {
                 $result = call_user_func_array($rule, [$value, $data]);
 
                 $info   = is_numeric($key) ? '' : $key;
             } else {
                 // 判断验证类型
+                
                 list($type, $rule, $info) = $this->getValidateType($key, $rule);
-
+                
                 if('list'== $rule) {
                     $result = $this->is($value,$rule);
                     
+                }elseif ('unique'== $rule) {
+                    
+                    $result = $this->unique($value,$rule);
+                }elseif ('arr_null'== $rule) {
+                    $result = $this->arr_null($value,$rule);
                 }
-                // 如果不是must 有数据才会行验证
                 elseif ($rule != '' && (0 === strpos($info, 'must') ||  (!is_null($value) && '' !== $value))) {
 
                     // 验证类型
@@ -454,11 +458,13 @@ class Valid
                     $result = call_user_func_array($callback, [$value, $rule, $data, $field, $title]);
 
                 } else {
+                    
                     $result = true;
                 }
             }
 
             if (false === $result) {
+
                 // 验证失败 返回错误信息
                 if (isset($msg[$i])) {
                     $message = $msg[$i];
@@ -467,7 +473,7 @@ class Valid
                     }
                 } else {
                     
-                   
+                    
                     $message = $this->getRuleMsg($field, $title, $info, $rule);
                    
                 }
@@ -506,9 +512,10 @@ class Valid
             }
             $info = $type;
         } elseif (method_exists($this, $rule)) {
+            
             $type = $rule;
             $info = $rule;
-            $rule = '';
+            $rule = $rule;
         } else {
             $type = 'is';
             $info = $rule;
@@ -698,8 +705,25 @@ class Valid
     * @param array     $data  数据
     * @return bool
     */
-    protected function unique($value,$rule,$data) {
+    protected function unique($value,$rule) {
         return is_array($value)  && count($value) == count(array_unique($value));
+    }
+    /**
+    * 验证数组是否有空值
+    * @access protected
+    * @param mixed     $value  字段值
+    * @param mixed     $rule  验证规则
+    * @param array     $data  数据
+    * @return bool
+    */
+    protected function arr_null($value,$rule) {
+        if(!is_array($value)) return false;
+        foreach ($value as $key => $v) {
+            if($v =='' || $v=='null') {
+            return false;
+            }
+        }    
+        return true;
     }
 
     /**
